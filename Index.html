@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS GAMING STORE</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#0b0613;color:white;
+ font-family:Arial,sans-serif;
+}
+header{
+ background:#14091f;padding:18px;
+ display:flex;justify-content:space-between;
+ align-items:center;flex-wrap:wrap;
+ border-bottom:2px solid #a020f0;
+}
+.logo{font-size:25px;font-weight:bold;color:#e6a4ff}
+.logo span{display:block;font-size:11px;letter-spacing:4px}
+button{
+ border:0;padding:12px 18px;border-radius:8px;
+ background:linear-gradient(90deg,#7800d8,#d000ff);
+ color:white;font-weight:bold;cursor:pointer;
+}
+nav{
+ background:#1b0d2b;padding:15px;
+ display:flex;justify-content:center;gap:25px;
+ flex-wrap:wrap;
+}
+nav a{color:white;text-decoration:none;font-weight:bold}
+.hero{
+ text-align:center;padding:55px 15px;
+ background:linear-gradient(130deg,#250642,#6500a5,#170526);
+ margin:18px;border:1px solid #b42cff;border-radius:15px;
+}
+.hero h1{font-size:65px;margin:5px;text-shadow:0 0 20px #e000ff}
+.hero h2{color:#e7a5ff}
+.hero p{color:#ffe0ff}
+main{max-width:1100px;margin:auto;padding:15px}
+h2.section{color:#e6a4ff;text-align:center;margin-top:35px}
+.game-title{color:#ffd34e;margin-top:35px}
+.products{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+}
+.product{
+ background:linear-gradient(145deg,#241035,#10091a);
+ border:1px solid #8d26c9;border-radius:14px;
+ padding:20px;text-align:center;
+ box-shadow:0 0 12px #9700ff22;
+}
+.product .image{font-size:55px;padding:20px}
+.product h3{min-height:42px}
+.price{font-size:27px;color:#ffd34e;font-weight:bold;margin:15px}
+.product button{width:100%}
+.panel{
+ background:#180d25;border:1px solid #8d26c9;
+ padding:20px;border-radius:12px;margin-top:25px;
+}
+input{
+ width:100%;padding:13px;margin:8px 0;
+ background:#0c0713;border:1px solid #8d26c9;
+ border-radius:7px;color:white;
+}
+#message{color:#ffd34e}
+#orders{line-height:2}
+footer{
+ margin-top:40px;padding:25px;text-align:center;
+ background:#14091f;color:#d8c5e7;
+}
+.hidden{display:none}
+dialog{
+ background:#1b0d2b;color:white;
+ border:1px solid #c04aff;border-radius:12px;
+ width:min(420px,92%);
+}
+@media(max-width:700px){
+ .products{grid-template-columns:1fr 1fr}
+ .hero h1{font-size:45px}
+}
+@media(max-width:450px){
+ .products{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">
+  ♛ NEXUS
+  <span>GAMING STORE</span>
+ </div>
+ <div>
+  <span id="userInfo">Chưa đăng nhập</span>
+  <button id="openLogin">Đăng nhập</button>
+  <button id="logout" class="hidden">Đăng xuất</button>
+ </div>
+</header>
+
+<nav>
+ <a href="#shop">Túi mù</a>
+ <a href="#orders">Đơn hàng</a>
+ <a href="#contact">Liên hệ</a>
+</nav>
+
+<section class="hero">
+ <p>WELCOME TO</p>
+ <h1>NEXUS</h1>
+ <h2>GAMING STORE</h2>
+ <p>SHOP TÚI MÙ FREE FIRE & LIÊN QUÂN</p>
+ <p>⚡ Nhanh chóng - Uy tín - Chuyên nghiệp ⚡</p>
+</section>
+
+<main>
+<section id="shop">
+ <h2 class="section">🎁 SHOP TÚI MÙ</h2>
+
+ <h3 class="game-title">🔥 TÚI MÙ FREE FIRE</h3>
+ <div class="products" id="freeFireProducts"></div>
+
+ <h3 class="game-title">⚔️ TÚI MÙ LIÊN QUÂN</h3>
+ <div class="products" id="lienQuanProducts"></div>
+</section>
+
+<section class="panel" id="orders">
+ <h2>📦 ĐƠN HÀNG CỦA BẠN</h2>
+ <div id="orderList">Đăng nhập để xem đơn hàng.</div>
+</section>
+
+<section class="panel" id="contact">
+ <h2>☎️ LIÊN HỆ HỖ TRỢ</h2>
+ <p>Zalo / Điện thoại: <b>0933454413</b></p>
+ <p>Email: <b>checongthanh33@gmail.com</b></p>
+</section>
+</main>
+
+<footer>
+ © 2026 NEXUS GAMING STORE
+</footer>
+
+<dialog id="loginDialog">
+ <h2>ĐĂNG NHẬP NEXUS</h2>
+ <input id="email" type="email" placeholder="Địa chỉ Email">
+ <input id="password" type="password" placeholder="Mật khẩu">
+ <button id="loginBtn">Đăng nhập</button>
+ <button id="registerBtn">Tạo tài khoản</button>
+ <button id="closeDialog">Đóng</button>
+ <p id="message"></p>
+</dialog>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+// ===================================
+// 1. ĐIỀN CẤU HÌNH FIREBASE CỦA BẠN
+// ===================================
+
+const firebaseConfig = {
+ apiKey: "DAN_API_KEY_CUA_BAN",
+ authDomain: "TEN_DU_AN.firebaseapp.com",
+ projectId: "TEN_DU_AN",
+ storageBucket: "TEN_DU_AN.appspot.com",
+ messagingSenderId: "SENDER_ID",
+ appId: "APP_ID"
+};
+
+// Khởi tạo Firebase
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ===================================
+// 2. DANH SÁCH SẢN PHẨM
+// ===================================
+
+const products = [
+ {
+  id:"ff99",
+  game:"Free Fire",
+  name:"Túi mù Free Fire 99K",
+  price:99000,
+  icon:"🔥"
+ },
+ {
+  id:"ff299",
+  game:"Free Fire",
+  name:"Túi mù Free Fire 299K",
+  price:299000,
+  icon:"💜"
+ },
+ {
+  id:"ff999",
+  game:"Free Fire",
+  name:"Túi mù Free Fire 999K",
+  price:999000,
+  icon:"👑"
+ },
+ {
+  id:"lq99",
+  game:"Liên Quân",
+  name:"Túi mù Liên Quân 99K",
+  price:99000,
+  icon:"⚔️"
+ },
+ {
+  id:"lq299",
+  game:"Liên Quân",
+  name:"Túi mù Liên Quân 299K",
+  price:299000,
+  icon:"💎"
+ },
+ {
+  id:"lq999",
+  game:"Liên Quân",
+  name:"Túi mù Liên Quân 999K",
+  price:999000,
+  icon:"🏆"
+ }
+];
+
+function formatMoney(number){
+ return new Intl.NumberFormat("vi-VN").format(number)+"đ";
+}
+
+// ===================================
+// 3. HIỂN THỊ SẢN PHẨM
+// ===================================
+
+function showProducts(){
+
+ const ff = document.getElementById("freeFireProducts");
+ const lq = document.getElementById("lienQuanProducts");
+
+ products.forEach(product=>{
+
+  const card = document.createElement("div");
+  card.className="product";
+
+  card.innerHTML=`
+   <div class="image">${product.icon}</div>
+   <h3>${product.name}</h3>
+   <div class="price">${formatMoney(product.price)}</div>
+   <button>MUA NGAY</button>
+  `;
+
+  card.querySelector("button").onclick=()=>{
+   buyProduct(product.id);
+  };
+
+  if(product.game==="Free Fire"){
+   ff.appendChild(card);
+  }else{
+   lq.appendChild(card);
+  }
+
+ });
+}
+
+showProducts();
+
+// ===================================
+// 4. ĐĂNG NHẬP / ĐĂNG KÝ
+// ===================================
+
+const dialog=document.getElementById("loginDialog");
+
+document.getElementById("openLogin").onclick=()=>{
+ dialog.showModal();
+};
+
+document.getElementById("closeDialog").onclick=()=>{
+ dialog.close();
+};
+
+document.getElementById("loginBtn").onclick=async()=>{
+
+ const email=document.getElementById("email").value;
+ const password=document.getElementById("password").value;
+
+ try{
+  await auth.signInWithEmailAndPassword(email,password);
+  dialog.close();
+ }catch(error){
+  document.getElementById("message").textContent=error.message;
+ }
+
+};
+
+document.getElementById("registerBtn").onclick=async()=>{
+
+ const email=document.getElementById("email").value;
+ const password=document.getElementById("password").value;
+
+ try{
+  await auth.createUserWithEmailAndPassword(email,password);
+  dialog.close();
+ }catch(error){
+  document.getElementById("message").textContent=error.message;
+ }
+
+};
+
+document.getElementById("logout").onclick=()=>{
+ auth.signOut();
+};
+
+// ===================================
+// 5. THEO DÕI TÀI KHOẢN
+// ===================================
+
+auth.onAuthStateChanged(user=>{
+
+ const info=document.getElementById("userInfo");
+ const login=document.getElementById("openLogin");
+ const logout=document.getElementById("logout");
+
+ if(user){
+  info.textContent=user.email;
+  login.classList.add("hidden");
+  logout.classList.remove("hidden");
+  loadOrders(user.uid);
+ }else{
+  info.textContent="Chưa đăng nhập";
+  login.classList.remove("hidden");
+  logout.classList.add("hidden");
+  document.getElementById("orderList").textContent=
+   "Đăng nhập để xem đơn hàng.";
+ }
+
+});
+
+// ===================================
+// 6. TẠO YÊU CẦU MUA TÚI MÙ
+// ===================================
+
+async function buyProduct(productId){
+
+ const user=auth.currentUser;
+
+ if(!user){
+  alert("Bạn cần đăng nhập trước!");
+  dialog.showModal();
+  return;
+ }
+
+ const product=products.find(p=>p.id===productId);
+
+ if(!product)return;
+
+ const confirmed=confirm(
+  "Bạn muốn tạo yêu cầu mua "+product.name+
+  " với giá "+formatMoney(product.price)+"?"
+ );
+
+ if(!confirmed)return;
+
+ try{
+
+  const order=await db.collection("orders").add({
+   uid:user.uid,
+   email:user.email,
+   productId:product.id,
+   productName:product.name,
+   game:product.game,
+   price:product.price,
+   status:"pending",
+   createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  alert("Đã tạo yêu cầu mua hàng!\nMã đơn: "+order.id);
+  loadOrders(user.uid);
+
+ }catch(error){
+  alert("Không thể tạo đơn: "+error.message);
+ }
+
+}
+
+// ===================================
+// 7. HIỂN THỊ LỊCH SỬ ĐƠN
+// ===================================
+
+async function loadOrders(uid){
+
+ const list=document.getElementById("orderList");
+ list.textContent="Đang tải đơn hàng...";
+
+ try{
+
+  const snapshot=await db.collection("orders")
+   .where("uid","==",uid)
+   .get();
+
+  if(snapshot.empty){
+   list.textContent="Bạn chưa có đơn hàng nào.";
+   return;
+  }
+
+  list.innerHTML="";
+
+  snapshot.forEach(doc=>{
+
+   const order=doc.data();
+
+   const item=document.createElement("div");
+   item.className="panel";
+
+   const status={
+    pending:"Đang chờ xử lý",
+    approved:"Đã duyệt",
+    rejected:"Từ chối"
+   }[order.status]||"Đang xử lý";
+
+   item.textContent=
+    order.productName+" | "+
+    formatMoney(order.price)+" | "+
+    status+" | Mã: "+doc.id;
+
+   list.appendChild(item);
+
+  });
+
+ }catch(error){
+  list.textContent="Không tải được đơn hàng.";
+ }
+
+}
+</script>
+</body>
+</html>
